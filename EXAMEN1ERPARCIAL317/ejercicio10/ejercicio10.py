@@ -16,7 +16,7 @@ def main():
 
     procesos = []
     for i in range(M):
-        inicio = 2  # Reiniciar el inicio para cada proceso
+        inicio = i * N * paso + 2
         fin = inicio + N * paso
         p = mp.Process(target=generar_serie, args=(inicio, fin, paso, resultados))
         procesos.append(p)
