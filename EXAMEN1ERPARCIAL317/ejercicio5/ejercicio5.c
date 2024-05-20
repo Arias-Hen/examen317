@@ -2,53 +2,64 @@
 #include <stdlib.h>
 #include <mpi.h>
 
-#define N 4 // Definimos el tamaño de la matriz y el vector
-
 int main(int argc, char *argv[]) {
-	int size, rank;
-	MPI_Init(&argc, &argv);
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    int size, rank;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	int matriz[N][N];
-	int vector[N];
-	int resultadoParcial[N] = { 0 };
+    int tamano;
+    if (rank == 0) {
+        printf("Introduce el tamaÃ±o de la matriz y el vector: ");
+        scanf("%d", &tamano);
+    }
 
-	if (rank == 0) {
-		printf("Matriz:\n");
-		for (int i = 0; i < N; i++) {
-			vector[i] = i + 1; // Ejemplo de inicialización del vector
-			for (int j = 0; j < N; j++) {
-				matriz[i][j] = i * N + j + 1; // Ejemplo de inicialización de la matriz
-				printf("%d ", matriz[i][j]);
-			}
-			printf("\n");
-		}
+    MPI_Bcast(&tamano, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-		printf("\nVector:\n");
-		for (int i = 0; i < N; i++) {
-			printf("%d\n", vector[i]);
-		}
-		printf("\n");
-	}
+    int nueva_matriz[tamano][tamano];
+    int nuevo_vector[tamano];
+    int resultado_parcial[tamano];
 
-	MPI_Bcast(vector, N, MPI_INT, 0, MPI_COMM_WORLD);
+    if (rank == 0) {
+        printf("Matriz:\n");
+        for (int i = 0; i < tamano; i++) {
+            nuevo_vector[i] = rand() % 10 + 1; // NÃºmeros aleatorios entre 1 y 10
+            for (int j = 0; j < tamano; j++) {
+                nueva_matriz[i][j] = rand() % 10 + 1; // NÃºmeros aleatorios entre 1 y 10
+                printf("%d ", nueva_matriz[i][j]);
+            }
+            printf("\n");
+        }
 
-	for (int i = rank; i < N; i += size) {
-		for (int j = 0; j < N; j++) {
-			resultadoParcial[i] += matriz[i][j] * vector[j];
-		}
-	}
+        printf("\nVector:\n");
+        for (int i = 0; i < tamano; i++) {
+            printf("%d\n", nuevo_vector[i]);
+        }
+        printf("\n");
 
-	MPI_Reduce(resultadoParcial, vector, N, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+        // InicializaciÃ³n del resultado parcial con ceros
+        for (int i = 0; i < tamano; i++) {
+            resultado_parcial[i] = 0;
+        }
+    }
 
-	if (rank == 0) {
-		printf("Resultado:\n");
-		for (int i = 0; i < N; i++) {
-			printf("%d\n", vector[i]);
-		}
-	}
+    MPI_Bcast(nuevo_vector, tamano, MPI_INT, 0, MPI_COMM_WORLD);
 
-	MPI_Finalize();
-	return 0;
+    for (int i = rank; i < tamano; i += size) {
+        for (int j = 0; j < tamano; j++) {
+            resultado_parcial[i] += nueva_matriz[i][j] * nuevo_vector[j];
+        }
+    }
+
+    MPI_Reduce(resultado_parcial, nuevo_vector, tamano, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    if (rank == 0) {
+        printf("Resultado:\n");
+        for (int i = 0; i < tamano; i++) {
+            printf("%d\n", nuevo_vector[i]);
+        }
+    }
+
+    MPI_Finalize();
+    return 0;
 }
