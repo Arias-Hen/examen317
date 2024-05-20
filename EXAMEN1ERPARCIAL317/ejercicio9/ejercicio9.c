@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
         MPI_Recv(&M, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     }
 
-    int inicio = 2; 
+    int inicio = rank * N * 2 + 2; 
     int fin = inicio + N * 2; 
 
     printf("Proceso %d: Serie generada: ", rank);
