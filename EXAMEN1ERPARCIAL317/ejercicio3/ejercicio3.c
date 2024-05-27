@@ -19,10 +19,17 @@ int main() {
     }
 
     // División por resta
-    #pragma omp parallel for reduction(-:a) reduction(+:division)
-    for (int i = 0; i < b; i++) {
-        division++;
-        a -= b;
+    int temp_a = a;  
+
+    #pragma omp parallel
+    {
+        #pragma omp single
+        {
+            while (temp_a >= b) {
+                temp_a -= b;
+                division++;
+            }
+        }
     }
 
     printf("Multiplicación por suma: %d\n", multiplicacion);
