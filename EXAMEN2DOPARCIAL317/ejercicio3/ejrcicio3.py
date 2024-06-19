@@ -1,20 +1,31 @@
+# EJERCICIO 3
+
 import cv2
-import numpy as np
 from matplotlib import pyplot as plt
+from google.colab import drive
+import os
 
-img1 = cv2.imread("IM1.jpg");
-img2 = cv2.imread("IM2.jpg");
+drive.mount("/content/drive")
+os.chdir("/content/drive/MyDrive/INF317")
 
-plt.figure(figsize=(10, 10))
+imG1 = cv2.imread("IMG3.png")
+imG2 = cv2.imread("IMG4.png")
 
-# Muestra la primera imagen
-plt.subplot(1, 2, 1) # (filas, columnas, índice de la imagen)
+adicion = cv2.addWeighted(imG1, 0.8, imG2, 0.1, 0)
+
+resta = cv2.subtract(imG1, imG2)
+
+plt.figure(figsize=(10, 5))
+
+# Mostrar la imagen resultante de la adición
+plt.subplot(1, 2, 1)
+plt.title("SUMA")
 plt.imshow(cv2.cvtColor(adicion, cv2.COLOR_BGR2RGB))
-plt.title('Adición')
 
-# Muestra la segunda imagen
-plt.subplot(1, 2, 2) # (filas, columnas, índice de la imagen)
+# Mostrar la imagen resultante de la sustracción
+plt.subplot(1, 2, 2)
+plt.title("RESTA")
 plt.imshow(cv2.cvtColor(resta, cv2.COLOR_BGR2RGB))
-plt.title('Resta')
 
+# Mostrar la figura
 plt.show()
